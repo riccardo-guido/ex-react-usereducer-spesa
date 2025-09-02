@@ -9,11 +9,28 @@ function App() {
   ];
 
   const [addedProducts, setAddedProducts] = useState([]);
+  const updateProductQuantity = (name, quantity) => {
+    setAddedProducts((curr) =>
+      curr.map((p) => {
+        if (p.name === name) {
+          return {
+            ...p,
+            quantity,
+          };
+        }
+        return p;
+      })
+    );
+  };
   const addToCart = (product) => {
-    const isProductAlreadyAdded = addedProducts.some(
+    const alreadyAddedProduct = addedProducts.find(
       (p) => p.name === product.name
     );
-    if (isProductAlreadyAdded) {
+    if (alreadyAddedProduct) {
+      updateProductQuantity(
+        alreadyAddedProduct.name,
+        alreadyAddedProduct.quantity + 1
+      );
       return;
     }
 
@@ -25,6 +42,15 @@ function App() {
       },
     ]);
   };
+
+  const removeFromCart = (product) => {
+    setAddedProducts((curr) => curr.filter((p) => p.name !== product.name));
+  };
+
+  const totalToPay = addedProducts.reduce(
+    (acc, p) => acc + p.price * p.quantity,
+    0
+  );
 
   return (
     <>
@@ -49,9 +75,13 @@ function App() {
                 <p>
                   {p.quantity} x {p.name} ({p.price.toFixed(2)}€)
                 </p>
+                <button onClick={() => removeFromCart(p)}>
+                  Rimuovi dal carrello
+                </button>
               </li>
             ))}
           </ul>
+          <h3>Totale da pagare: {totalToPay.toFixed(2)}€</h3>
         </>
       )}
     </>
